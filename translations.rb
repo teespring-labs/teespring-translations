@@ -12,18 +12,8 @@ get '/' do
 end
 
 # rails teespring
-post '/rails-teespring' do
-  run_the_stuff('rails-teespring')
-end
-
-# composer
-post '/composer' do
-  run_the_stuff('composer')
-end
-
-# direct-composer
-post '/direct-composer' do
-  run_the_stuff('direct-composer')
+post '/:repo' do
+  run_the_stuff(params[:repo])
 end
 
 def run_the_stuff(repo)
