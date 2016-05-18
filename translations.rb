@@ -5,7 +5,7 @@ require_relative 'models/pull_request'
 
 ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
 
-$usernames = ["@mikekavouras"]
+$usernames = ["@mikekavouras", "@kndrybecky"]
 
 get '/' do
   "Hello, 👊!"
@@ -20,6 +20,7 @@ def run_the_stuff(repo)
   json = JSON.parse(request.body.read)
   pr = json["pull_request"]
 
+  halt 200 if blacklisted?(pr)
   halt 200 if has_already_notified_pr?(pr)
   halt 200 if payload_action_is?(json, 'labeled')
 
@@ -76,4 +77,8 @@ end
 
 def locales_path(repo)
   return repo === 'rails-teespring' ? 'config/locales' : 'src/locales'
+end
+
+def blacklisted?(pr)
+  return true if pr["base"]["ref"] == 'danielson_develop'
 end
