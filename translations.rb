@@ -15,7 +15,7 @@ end
 
 def get_diff(pr)
   sha = pr["head"]["sha"]
-  "#{`./scripts/run_da_diff #{sha} #{ENV['token']}`}".split("\n")
+  "#{`./scripts/run_da_diff #{sha} #{ENV['TOKEN']}`}".split("\n")
 end
 
 get '/' do
@@ -30,7 +30,7 @@ post '/payload' do
 
   if locales.count > 0
     message = "@mikekavouras: #{$messages.sample}"
-    `curl "https://api.github.com/repos/teespring/rails-teespring/issues/#{pr["number"]}/comments" -u #{ENV['username']}:#{ENV['token']} -d '{"body":"#{message}"}'`
+    `curl "https://api.github.com/repos/teespring/rails-teespring/issues/#{pr["number"]}/comments" -u #{ENV['USERNAME']}:#{ENV['TOKEN']} -d '{"body":"#{message}"}'`
   end
 
   status 200
