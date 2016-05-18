@@ -1,12 +1,16 @@
 require 'sinatra'
 require 'json'
+require 'active_record'
+require_relative 'models/pull_request'
+
+ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
 
 $locales_path = "config/locales"
 $usernames = ["@mikekavouras"]
 $filename = "pull_requests.json"
 
 get '/' do
-  "Hello, world!"
+  "Hello, 👊!"
 end
 
 # rails teespring
@@ -44,34 +48,20 @@ def run_the_stuff(repo)
 end
 
 def has_already_notified_pr?(pr)
-  return false unless File.exists?($filename)
-
-  file = File.read($filename)
-  arr = JSON.parse(file)
-  arr.include?(pr["number"].to_s)
+  PullRequest.where(number: pr["number"]).first
 end
 
 def log_pr_notified(pr)
-  File.new($filename, "w+") unless File.exists?($filename)
-  file = File.read($filename)
-
-  arr = JSON.parse(file) rescue []
-  arr << pr["number"].to_s
-
-  File.open($filename, "r+") { |f| f.write(arr.to_json) }
+  PullRequest.create(number: pr["number"])
 end
 
 def post_comment(pr, repo, locales)
   message = format_message(locales)
-  puts "*** posting comment ***"
   `curl "https://api.github.com/repos/teespring/#{repo}/issues/#{pr["number"]}/comments" -u #{ENV['USERNAME']}:#{ENV['TOKEN']} -d '{"body":"#{message}"}'`
-  puts "*** finished posting comment ***"
 end
 
 def post_label(pr, repo)
-  puts "*** posting label ***"
   `curl "https://api.github.com/repos/teespring/#{repo}/issues/#{pr["number"]}/labels" -u #{ENV['USERNAME']}:#{ENV['TOKEN']} -d '["Translations"]'`
-  puts "*** finished posting label ***"
 end
 
 def payload_action_is?(payload, action)
@@ -95,3 +85,4 @@ def check_diff(pr, repo)
   sha = pr["head"]["sha"]
   "#{`./scripts/run_da_diff #{sha} #{ENV['TOKEN']} #{repo} #{master_branch}`}".split("\n")
 end
+
