@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ ! -d git ]; then
+  mkdir git && cd git
+  git init
+  git remote add origin  https://$2:x-oauth-basic@github.com/teespring/rails-teespring.git
+  cd ..
+fi
+
+cd git
+git fetch
+git diff --name-only origin/develop...$1
