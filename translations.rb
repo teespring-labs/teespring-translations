@@ -22,7 +22,7 @@ get '/' do
   "Hello, world!"
 end
 
-post '/' do
+post '/payload' do
 
   pr = fetch_and_parse_json["pull_request"]
   diff = get_diff(pr)
