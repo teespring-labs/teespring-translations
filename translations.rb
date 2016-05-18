@@ -5,9 +5,7 @@ require_relative 'models/pull_request'
 
 ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
 
-$locales_path = "config/locales"
 $usernames = ["@mikekavouras"]
-$filename = "pull_requests.json"
 
 get '/' do
   "Hello, 👊!"
@@ -36,7 +34,7 @@ def run_the_stuff(repo)
   halt 200 if payload_action_is?(json, 'labeled')
 
   diff = check_diff(pr, repo)
-  locales = diff.select { |d| d.include? $locales_path }
+  locales = diff.select { |d| d.include? locales_path(repo) }
 
   unless locales.empty?
     post_comment(pr, repo, locales) unless locales.empty?
@@ -86,3 +84,6 @@ def check_diff(pr, repo)
   "#{`./scripts/run_da_diff #{sha} #{ENV['TOKEN']} #{repo} #{master_branch}`}".split("\n")
 end
 
+def locales_path(repo)
+  return repo === 'rails-teespring' ? 'config/locales' : 'src/locales'
+end
