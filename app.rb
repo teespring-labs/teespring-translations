@@ -1,7 +1,9 @@
 require 'sinatra'
 require 'json'
 require 'active_record'
+
 require_relative 'models/pull_request'
+require_relative 'models/blacklist'
 
 ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
 
@@ -18,19 +20,19 @@ end
 
 def run_the_stuff(repo)
   json = JSON.parse(request.body.read)
-  pr = json["pull_request"]
+  pull_request = json["pull_request"]
 
-  halt 200 if blacklisted?(pr)
-  halt 200 if has_already_notified_pr?(pr)
+  halt 200 if Blacklist.include?(pull_request)
+  halt 200 if has_already_notified_pr?(pull_request)
   halt 200 if payload_action_is?(json, 'labeled')
 
-  diff = check_diff(pr, repo)
+  diff = check_diff(pull_request, repo)
   locales = diff.select { |d| d.include? locales_path(repo) }
 
   unless locales.empty?
-    post_comment(pr, repo, locales) unless locales.empty?
-    post_label(pr, repo) unless locales.empty?
-    log_pr_notified(pr)
+    post_comment(pull_request, repo, locales) unless locales.empty?
+    post_label(pull_request, repo) unless locales.empty?
+    log_pr_notified(pull_request)
   end
 
   status 200
@@ -77,8 +79,4 @@ end
 
 def locales_path(repo)
   return repo === 'rails-teespring' ? 'config/locales' : 'src/locales'
-end
-
-def blacklisted?(pr)
-  return true if pr["base"]["ref"] == 'danielson_develop'
 end
