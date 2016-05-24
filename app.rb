@@ -2,11 +2,13 @@ require 'sinatra'
 require 'json'
 require 'active_record'
 require 'metafrazo'
+require 'sidekiq'
 
 require_relative 'models/blacklist'
+require_relative 'models/pull_request'
+require_relative 'workers/pull_request_worker'
 
 ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
-class PullRequest < ActiveRecord::Base; end
 
 Metafrazo.configure do |config|
   config.usernames = ["@mikekavouras"]
@@ -25,6 +27,14 @@ Metafrazo.configure do |config|
   }
 end
 
+Sidekiq.configure_client do |config|
+  config.redis = { db: 1 }
+end
+
+Sidekiq.configure_server do |config|
+  config.redis = { db: 1 }
+end
+
 get '/' do
   "Hello, 👊!"
 end
@@ -38,24 +48,11 @@ post '/:repo' do
   halt 200 if notified_pr?(pull_request)
   halt 200 if json["action"] == 'labeled'
 
-  if Metafrazo.run(json)
-    # log_pr(pull_request)
-    puts "*" * 80
-    puts "changes have occured"
-    puts "*" * 80
-  else
-    puts "*" * 80
-    puts "NO changes have occured"
-    puts "*" * 80
-  end
+  PullRequestWorker.perform_async(json)
 
   status 200
 end
 
 def notified_pr?(pr)
   PullRequest.where(number: pr["number"]).first
-end
-
-def log_pr(pr)
-  PullRequest.create(number: pr["number"])
 end
