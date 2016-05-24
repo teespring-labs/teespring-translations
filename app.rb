@@ -11,7 +11,7 @@ require_relative 'workers/pull_request_worker'
 ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
 
 Metafrazo.configure do |config|
-  config.usernames = ["@mikekavouras"]
+  config.usernames = ["@mikekavouras", "@kndrybecky"]
   config.token = ENV['TOKEN']
   config.repos = {
     "teespring/rails-teespring" => {
