@@ -8,7 +8,7 @@ class PullRequestWorker
     puts "performing..."
     puts "*" * 80
     if Metafrazo.run(json)
-      PullRequest.create(number: json["pull_request"]["number"])
+      # PullRequest.create(number: json["pull_request"]["number"])
     end
   end
 
