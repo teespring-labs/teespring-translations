@@ -23,7 +23,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     i18n (0.7.0)
     json (1.8.3)
-    metafrazo (0.1.5)
+    metafrazo (0.2.0)
       octokit (~> 4.0)
     minitest (5.9.0)
     multipart-post (2.0.0)
