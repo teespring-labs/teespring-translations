@@ -15,7 +15,7 @@ Metafrazo.configure do |config|
   config.token = ENV['TOKEN']
   config.repos = {
     "teespring/rails-teespring" => {
-      compare_branch: "develop",
+      base_branch: "develop",
       path: "config/locales"
     },
     "teespring/composer" => {
