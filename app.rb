@@ -11,7 +11,7 @@ require_relative 'workers/pull_request_worker'
 ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
 
 Metafrazo.configure do |config|
-  config.usernames = ["@mikekavouras", "@kndrybecky"]
+  config.usernames = ["@mikekavouras", "@cande"]
   config.token = ENV['TOKEN']
   config.slack_webhook_url = ENV['SLACK_WEBHOOK_URL']
   config.repos = {
