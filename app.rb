@@ -47,7 +47,7 @@ post '/:repo' do
 
   halt 200 if Blacklist.include?(pull_request)
   # halt 200 if notified_pr?(pull_request)
-  halt 200 unless json["action"] == "opened" || json["action"] == "edited"
+  halt 200 unless json["action"] == "opened"# || json["action"] == "edited"
 
   PullRequestWorker.perform_async(json)
 
