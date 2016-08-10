@@ -46,8 +46,8 @@ post '/:repo' do
   pull_request = json["pull_request"]
 
   halt 200 if Blacklist.include?(pull_request)
-  # halt 200 if notified_pr?(pull_request)
-  halt 200 unless json["action"] == "opened"# || json["action"] == "edited"
+  halt 200 unless merged?(pull_request)
+  halt 200 if notified_pr?(pull_request)
 
   PullRequestWorker.perform_async(json)
 
@@ -56,4 +56,8 @@ end
 
 def notified_pr?(pr)
   PullRequest.where(number: pr["number"]).first
+end
+
+def merged?(pr)
+  pr["action"] == "closed" && pr["base"]["merged"] == true
 end
