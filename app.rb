@@ -59,5 +59,5 @@ def notified_pr?(pr)
 end
 
 def merged?(pr)
-  pr["action"] == "closed" && pr["base"]["merged"] == true
+  pr["action"] == "closed" && pr["merged"] == true
 end
